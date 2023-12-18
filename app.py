@@ -3,12 +3,16 @@ import requests
 import pandas as pd
 import time
 
+st.header("🎄 Holy Night Funkgeräte")
+
 responseCount = requests.get("https://qr.rocksolidsiegen.de/api/dashboard.php", timeout=2)
 df = pd.json_normalize(responseCount.json())
 df["Ausgeliehen"] = df["count_away"].astype(int)/df["total_count"].astype(int)*100
 df["Auf Lager"] = 100-df["Ausgeliehen"]
 
 st.bar_chart(df, x="dienst", y=["Auf Lager", "Ausgeliehen"], color=["#0ac247", "#1900ff"])
+ex_zuletzt_zahlen = st.expander("Zahlen")
+ex_zuletzt_zahlen.dataframe(df.drop(columns=["Ausgeliehen", "Auf Lager"]))
 
 responseAusgeliehen = requests.get("https://qr.rocksolidsiegen.de/api/db_recent_ausgeliehen.php", timeout=2)
 df_zuletzt_ausgeliehen = pd.json_normalize(responseAusgeliehen.json())
